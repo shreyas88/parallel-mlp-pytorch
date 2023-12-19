@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from torch.cuda.amp import custom_fwd, custom_bwd
 
 
 class LinearColumnWithGradReduce(torch.autograd.Function):
