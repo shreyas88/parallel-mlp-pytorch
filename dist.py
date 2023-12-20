@@ -27,12 +27,9 @@ def my_test(weight_layer1,bias_layer1,weight_layer2,bias_layer2, x):
 
     rowParallelLinearModule = RowParallelLinear(weight_per_rank_layer2, bias_layer2).to(torch.cuda.current_device())
     out_layer2 = rowParallelLinearModule(out_relu_per_rank)
-    
-    #print("My rank",rank)
-    #print(torch.cuda.get_device())
-    print("Rank output:",out_layer1_per_rank.cpu().shape)
-    print("Rank output:",out_layer2.shape)
-    #print("Output:",out.cpu().shape)
+
+    print("Layer1 output:",out_layer1_per_rank.cpu().shape)
+    print("Layer2 output:",out_layer2.cpu().shape)
 
 
 if __name__=='__main__':
