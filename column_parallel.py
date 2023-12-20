@@ -49,4 +49,4 @@ class ColumnParallelLinear(torch.nn.Module):
         self.bias = nn.Parameter(bias_per_rank)
 
     def forward(self, input_: torch.Tensor):
-        return LinearColumnWithGradReduce.apply(input_, self.weight, self.bias)
+        return LinearColumnWithGradReduce.apply(input_, self.weight, self.bias, self.rank)
