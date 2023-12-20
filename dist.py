@@ -12,7 +12,7 @@ BATCH_SIZE = 1024
 SEQ_LEN = 128
 
 def my_test(weight_layer1,bias_layer1,weight_layer2,bias_layer2, x):
-    torch.cuda.set_sync_debug_mode(True)
+    torch.cuda.set_sync_debug_mode("warn")
     rank = dist.get_rank()
     output_size_per_partition = HIDDEN_DIM*2
     weight_per_rank_layer1 = torch.split(weight_layer1, output_size_per_partition, -1)[rank]
