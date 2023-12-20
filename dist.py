@@ -47,6 +47,7 @@ if __name__=='__main__':
     base_output = base_mlp(x).cpu()
     dist_out = dist_launcher(2,my_test,weight_layer1,bias_layer1,weight_layer2, bias_layer2, x)
     #print(dist_out)
-    #print(base_output)
+    print(base_output[0][0][0:10])
+    print(dist_out[0][0][0:10])
     assert torch.allclose(base_output, dist_out, atol=1e-4)
     print("Parallel MLP output matched with base MLP output")
