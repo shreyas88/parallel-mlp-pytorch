@@ -1,6 +1,6 @@
 import os
 import torch
-from torch.multiprocessing import Process, Queue
+from torch.multiprocessing import Process, Manager
 
 def dist_init(rank, num_procs, run_func, *func_args, **func_kwargs):
     """Initialize torch.distributed and execute the user function."""
@@ -27,18 +27,13 @@ def dist_init(rank, num_procs, run_func, *func_args, **func_kwargs):
     func_args = (rank,) + func_args
     run_func(*func_args, **func_kwargs)
 
-    # make sure all ranks finish at the same time
-    torch.distributed.barrier()
-    # tear down after test completes
-    torch.distributed.destroy_process_group()
 
 def dist_launcher(num_procs, run_func, *func_args, **func_kwargs):
-    """Launch processes and gracefully handle failures."""
-
-    queue = Queue()
-    
+    """Launch processes and gracefully handle failures."""    
     # Spawn all workers on subprocesses.
     processes = []
+    manager = Manager()
+    queue = manager.Queue()
     func_args = (queue,) + func_args
     for local_rank in range(num_procs):
         p = Process(target=dist_init,
@@ -73,4 +68,6 @@ def dist_launcher(num_procs, run_func, *func_args, **func_kwargs):
     
     out = queue.get()
     queue.close()
+    # tear down after test completes
+    torch.distributed.destroy_process_group()
     return out
