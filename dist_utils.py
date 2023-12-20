@@ -27,6 +27,11 @@ def dist_init(rank, num_procs, run_func, *func_args, **func_kwargs):
     func_args = (rank,) + func_args
     run_func(*func_args, **func_kwargs)
 
+    # make sure all ranks finish at the same time
+    torch.distributed.barrier()
+    # tear down after test completes
+    torch.distributed.destroy_process_group()
+
 
 def dist_launcher(num_procs, run_func, *func_args, **func_kwargs):
     """Launch processes and gracefully handle failures."""    
@@ -67,6 +72,4 @@ def dist_launcher(num_procs, run_func, *func_args, **func_kwargs):
             print(f"Worker {rank} exited with code {p.exitcode}")
     
     out = queue.get()
-    # tear down after test completes
-    torch.distributed.destroy_process_group()
     return out
