@@ -10,7 +10,8 @@ class LinearRowWithTensorReduce(torch.autograd.Function):
         ctx.save_for_backward(input, weight)
         output = torch.matmul(input, weight) + bias
         # all reduce along tensor parallel dimension
-        return torch.distributed.all_reduce(output)
+        #return torch.distributed.all_reduce(output)
+        return output
         
 
     @staticmethod
