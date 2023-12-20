@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-class BaseMLPLayers(torch.module.nn):
+class BaseMLPLayers(torch.nn.Module):
     def __init__(self, weight_layer1, bias_layer1, weight_layer2, bias_layer2):
         super(BaseMLPLayers, self).__init__()
         self.linear_weight1 = nn.Parameter(weight_layer1)
