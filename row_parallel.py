@@ -40,4 +40,4 @@ class RowParallelLinear(torch.nn.Module):
 
     def forward(self, input_: torch.Tensor):
         # input_ is (batch, T, output_size_partition)
-        LinearRowWithTensorReduce.apply(input_, self.weight, self.bias)
+        return LinearRowWithTensorReduce.apply(input_, self.weight, self.bias)
