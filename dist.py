@@ -1,6 +1,7 @@
 import torch
 from dist_utils import dist_launcher
 from column_parallel import ColumnParallelLinear
+from row_parallel import RowParallelLinear
 import torch.distributed as dist
 import torch.multiprocessing as mp
 import torch.nn as nn
@@ -15,11 +16,18 @@ def my_test(weight_layer1,bias_layer1,weight_layer2,bias_layer2, x):
     output_size_per_partition = HIDDEN_DIM*2
     weight_per_rank = torch.split(weight_layer1, output_size_per_partition, -1)[rank]
     bias_per_rank = torch.split(bias_layer1, output_size_per_partition, -1)[rank]
+    
     myColParallelModule = ColumnParallelLinear(weight_per_rank, bias_per_rank).to(torch.cuda.current_device())
-    out_per_rank = myColParallelModule(x.to(torch.cuda.current_device()))
+    out_layer1_per_rank = myColParallelModule(x.to(torch.cuda.current_device()))
+    relu = nn.ReLU()
+    out_relu_per_rank = relu(out_layer1_per_rank)
+    rowParallelLinearModule = RowParallelLinear(weight_layer2, bias_layer2).to(torch.cuda.current_device())
+    out_layer2 = rowParallelLinearModule(out_relu_per_rank)
+    
     #print("My rank",rank)
     #print(torch.cuda.get_device())
-    print("Rank output:",out_per_rank.cpu().shape)
+    print("Rank output:",out_layer1_per_rank.cpu().shape)
+    print("Rank output:",out_layer2.cpu().shape)
     #print("Output:",out.cpu().shape)
 
 
