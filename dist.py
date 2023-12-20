@@ -30,7 +30,7 @@ def my_test(rank, queue, weight_layer1, bias_layer1, weight_layer2,bias_layer2, 
     out_layer2 = rowParallelLinearModule(out_relu_per_rank)
 
     if rank == 0:
-        queue.put(out_layer2.clone.detach())
+        queue.put(out_layer2.clone().detach())
 
 if __name__=='__main__':
     mp.set_start_method('spawn')
