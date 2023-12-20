@@ -9,7 +9,7 @@ class LinearColumnWithGradReduce(torch.autograd.Function):
     @custom_fwd
     def forward(ctx,input,weight,bias):
         ctx.save_for_backward(input, weight)
-        output = torch.matmul(input, weight.t())
+        output = torch.matmul(input, weight)
         return output + bias
 
     @staticmethod
