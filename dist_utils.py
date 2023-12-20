@@ -67,7 +67,6 @@ def dist_launcher(num_procs, run_func, *func_args, **func_kwargs):
             print(f"Worker {rank} exited with code {p.exitcode}")
     
     out = queue.get()
-    queue.close()
     # tear down after test completes
     torch.distributed.destroy_process_group()
     return out

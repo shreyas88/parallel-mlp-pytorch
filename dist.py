@@ -13,7 +13,6 @@ BATCH_SIZE = 1024
 SEQ_LEN = 128
 
 def my_test(rank, queue, weight_layer1, bias_layer1, weight_layer2,bias_layer2, x):
-    torch.cuda.set_sync_debug_mode("warn")
     rank = dist.get_rank()
     output_size_per_partition = HIDDEN_DIM*2
     weight_per_rank_layer1 = torch.split(weight_layer1, output_size_per_partition, -1)[rank]
@@ -31,7 +30,7 @@ def my_test(rank, queue, weight_layer1, bias_layer1, weight_layer2,bias_layer2, 
     out_layer2 = rowParallelLinearModule(out_relu_per_rank)
 
     if rank == 0:
-        queue.put(out_layer2.cpu())
+        queue.put(out_layer2.clone.detach())
 
 if __name__=='__main__':
     mp.set_start_method('spawn')
