@@ -7,10 +7,10 @@ class LinearColumnWithGradReduce(torch.autograd.Function):
     """See linear_with_grad_accumulation_and_async_allreduce"""
     @staticmethod
     @custom_fwd
-    def forward(ctx,input,weight,bias):
+    def forward(ctx,input,weight,bias,rank):
         ctx.save_for_backward(input, weight)
         output = torch.matmul(input, weight)
-        return output + bias
+        return output + bias if rank == 0 else output
 
     @staticmethod
     @custom_bwd
@@ -42,8 +42,9 @@ class ColumnParallelLinear(torch.nn.Module):
     The linear layer is defined as Y = XA + b. A is parallelized along
     its second dimension as A = [A_1, ..., A_p].
     """
-    def __init__(self, weight_per_rank, bias_per_rank):
+    def __init__(self, rank, weight_per_rank, bias_per_rank):
         super(ColumnParallelLinear, self).__init__()
+        self.rank = rank
         self.weight = nn.Parameter(weight_per_rank)
         self.bias = nn.Parameter(bias_per_rank)
 

@@ -20,13 +20,15 @@ def my_test(rank, queue, weight_layer1, bias_layer1, weight_layer2,bias_layer2, 
     
     weight_per_rank_layer2 = torch.split(weight_layer2, output_size_per_partition, 0)[rank]
 
-    myColParallelModule = ColumnParallelLinear(weight_per_rank_layer1, bias_per_rank_layer1).to(torch.cuda.current_device())
+    myColParallelModule = ColumnParallelLinear(rank, weight_per_rank_layer1, bias_per_rank_layer1).to(
+        torch.cuda.current_device())
     out_layer1_per_rank = myColParallelModule(x.to(torch.cuda.current_device()))
     
     relu = nn.ReLU()
     out_relu_per_rank = relu(out_layer1_per_rank)
 
-    rowParallelLinearModule = RowParallelLinear(weight_per_rank_layer2, bias_layer2).to(torch.cuda.current_device())
+    rowParallelLinearModule = RowParallelLinear(rank, weight_per_rank_layer2, bias_layer2).to(
+        torch.cuda.current_device())
     out_layer2 = rowParallelLinearModule(out_relu_per_rank)
 
     if rank == 0:

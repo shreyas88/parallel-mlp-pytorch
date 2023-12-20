@@ -6,9 +6,12 @@ from torch.cuda.amp import custom_fwd, custom_bwd
 class LinearRowWithTensorReduce(torch.autograd.Function):
     @staticmethod
     @custom_fwd
-    def forward(ctx,input,weight,bias):
+    def forward(ctx,input,weight,bias,rank):
         ctx.save_for_backward(input, weight)
-        output = torch.matmul(input, weight) + bias
+        if rank == 0:
+            output = torch.matmul(input, weight) + bias
+        else:
+            output = torch.matmul(input, weight)
         # all reduce along tensor parallel dimension
         torch.distributed.all_reduce(output)
         return output
@@ -32,8 +35,9 @@ class RowParallelLinear(torch.nn.Module):
     its second dimension as Z =   X  [ Y1
                                        Y2 ]
     """
-    def __init__(self, weight_per_rank, bias_per_rank):
+    def __init__(self, rank, weight_per_rank, bias_per_rank):
         super(RowParallelLinear, self).__init__()
+        self.rank = rank
         # weight_per_rank is (output_size_partition, input_size)
         self.weight = nn.Parameter(weight_per_rank)
         # bias_per_rank is (input_size,)
@@ -41,4 +45,4 @@ class RowParallelLinear(torch.nn.Module):
 
     def forward(self, input_: torch.Tensor):
         # input_ is (batch, T, output_size_partition)
-        return LinearRowWithTensorReduce.apply(input_, self.weight, self.bias)
+        return LinearRowWithTensorReduce.apply(input_, self.weight, self.bias, self.rank)
