@@ -31,7 +31,7 @@ def my_test(weight_layer1,bias_layer1,weight_layer2,bias_layer2, x):
     #print("My rank",rank)
     #print(torch.cuda.get_device())
     print("Rank output:",out_layer1_per_rank.cpu().shape)
-    print("Rank output:",out_layer2.cpu().shape)
+    print("Rank output:",out_layer2.shape)
     #print("Output:",out.cpu().shape)
 
 
