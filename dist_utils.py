@@ -2,7 +2,6 @@ import os
 import torch
 from torch.multiprocessing import Process
 
-
 def dist_init(rank, num_procs, run_func, *func_args, **func_kwargs):
     """Initialize torch.distributed and execute the user function."""
     os.environ["MASTER_ADDR"] = "localhost"
@@ -17,7 +16,7 @@ def dist_init(rank, num_procs, run_func, *func_args, **func_kwargs):
 
 
     torch.distributed.init_process_group(
-        backend="gloo",
+        backend="nccl",
         world_size=num_procs,
         rank=rank,
         init_method=init_method)
