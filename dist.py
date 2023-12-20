@@ -15,7 +15,7 @@ def my_test(weight_layer1,bias_layer1,weight_layer2,bias_layer2, x):
     input_size, output_size_per_partition = 40, HIDDEN_DIM*2
     weight_per_rank = torch.split(weight_layer1, output_size_per_partition, -1)[rank]
     bias_per_rank = torch.split(bias_layer1, output_size_per_partition, -1)[rank]
-    myColParallelModule = ColumnParallelLinear(rank, world_size, weight_per_rank, bias_per_rank).to(torch.cuda.get_device())
+    myColParallelModule = ColumnParallelLinear(weight_per_rank, bias_per_rank).to(torch.cuda.get_device())
     out, out_per_rank = myColParallelModule(x.to(torch.cuda.get_device()))
     #print("My rank",rank)
     #print(torch.cuda.get_device())
