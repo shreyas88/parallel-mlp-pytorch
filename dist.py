@@ -36,10 +36,10 @@ if __name__=='__main__':
     mp.set_start_method('spawn')
     weight_layer1 = torch.randn(HIDDEN_DIM, HIDDEN_DIM*4, dtype=torch.float32)
     #bias_layer1 = torch.randn(HIDDEN_DIM*4, dtype=torch.float32)
-    bias_layer1 = torch.zeroes(HIDDEN_DIM*4, dtype=torch.float32)
+    bias_layer1 = torch.zeros(HIDDEN_DIM*4, dtype=torch.float32)
     
     weight_layer2 = torch.randn(HIDDEN_DIM*4, HIDDEN_DIM, dtype=torch.float32)
-    bias_layer2 =  torch.zeroes(HIDDEN_DIM, dtype=torch.float32)
+    bias_layer2 =  torch.zeros(HIDDEN_DIM, dtype=torch.float32)
 
     x = torch.randn(BATCH_SIZE, SEQ_LEN, HIDDEN_DIM)
 
