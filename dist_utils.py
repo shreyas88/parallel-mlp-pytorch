@@ -1,6 +1,6 @@
 import os
 import torch
-from torch.multiprocessing import Process
+from torch.multiprocessing import Process, Queue
 
 def dist_init(rank, num_procs, run_func, *func_args, **func_kwargs):
     """Initialize torch.distributed and execute the user function."""
@@ -24,6 +24,7 @@ def dist_init(rank, num_procs, run_func, *func_args, **func_kwargs):
     if torch.cuda.is_available():
         torch.cuda.set_device(rank)
 
+    func_args = (rank,) + func_args
     run_func(*func_args, **func_kwargs)
 
     # make sure all ranks finish at the same time
@@ -34,8 +35,11 @@ def dist_init(rank, num_procs, run_func, *func_args, **func_kwargs):
 def dist_launcher(num_procs, run_func, *func_args, **func_kwargs):
     """Launch processes and gracefully handle failures."""
 
+    queue = Queue()
+    
     # Spawn all workers on subprocesses.
     processes = []
+    func_args = (queue,) + func_args
     for local_rank in range(num_procs):
         p = Process(target=dist_init,
                     args=(local_rank, num_procs, run_func, *func_args),
@@ -66,3 +70,7 @@ def dist_launcher(num_procs, run_func, *func_args, **func_kwargs):
             print(f"Worker {rank} killed by signal {-p.exitcode}")
         if p.exitcode > 0:
             print(f"Worker {rank} exited with code {p.exitcode}")
+    
+    out = queue.get()
+    queue.close()
+    return out
