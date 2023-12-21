@@ -26,7 +26,7 @@ def my_test(rank, queue, weight_layer1, bias_layer1, weight_layer2,bias_layer2, 
     x_cuda = x.to(device_id)
     out_layer1_per_rank = myColParallelModule(x_cuda)
     
-    relu = nn.ReLU()
+    relu = nn.ReLU().to(device_id)
     out_relu_per_rank = relu(out_layer1_per_rank)
 
     rowParallelLinearModule = RowParallelLinear(rank, weight_per_rank_layer2, bias_layer2).to(
@@ -34,7 +34,7 @@ def my_test(rank, queue, weight_layer1, bias_layer1, weight_layer2,bias_layer2, 
     out_layer2 = rowParallelLinearModule(out_relu_per_rank)
 
     # trigger backward pass
-    loss = torch.square(out_layer2- dummy_labels.to(device_id)).sum()
+    loss = torch.square(out_layer2.to(device_id)- dummy_labels.to(device_id)).sum()
     loss.backward()
 
     if rank == 0:
