@@ -7,10 +7,10 @@ class LinearColumnWithGradReduce(torch.autograd.Function):
     """See linear_with_grad_accumulation_and_async_allreduce"""
     @staticmethod
     @custom_fwd
-    def forward(ctx,input,weight,bias,rank):
+    def forward(ctx,input,weight,bias):
         ctx.save_for_backward(input, weight)
         output = torch.matmul(input, weight)
-        return output + bias if rank == 0 else output
+        return output + bias
 
     @staticmethod
     @custom_bwd
@@ -49,4 +49,4 @@ class ColumnParallelLinear(torch.nn.Module):
         self.bias = nn.Parameter(bias_per_rank)
 
     def forward(self, input_: torch.Tensor):
-        return LinearColumnWithGradReduce.apply(input_, self.weight, self.bias, self.rank)
+        return LinearColumnWithGradReduce.apply(input_, self.weight, self.bias)
