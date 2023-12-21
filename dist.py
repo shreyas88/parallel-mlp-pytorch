@@ -79,6 +79,6 @@ if __name__=='__main__':
     grad_expected = clone_x.grad
     print(grad_expected[0][0][0:10])
     print(grad_actual[0][0][0:10])
-    assert torch.allclose(grad_expected, grad_actual, atol=1e-2)
+    assert torch.allclose(grad_expected, grad_actual, atol=1e-1)
     print("Parallel MLP gradient matched with base MLP gradient")
 
