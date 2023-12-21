@@ -70,7 +70,10 @@ def dist_launcher(num_procs, run_func, *func_args, **func_kwargs):
             print(f"Worker {rank} killed by signal {-p.exitcode}")
         if p.exitcode > 0:
             print(f"Worker {rank} exited with code {p.exitcode}")
-    
-    activations = queue.get()
-    gradients = queue.get()
+    if not any(failed):
+        activations = queue.get()
+        gradients = queue.get()
+    else:
+        activations = None
+        gradients = None
     return activations, gradients
