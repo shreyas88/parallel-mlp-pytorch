@@ -71,5 +71,6 @@ def dist_launcher(num_procs, run_func, *func_args, **func_kwargs):
         if p.exitcode > 0:
             print(f"Worker {rank} exited with code {p.exitcode}")
     
-    out = queue.get()
-    return out
+    activations = queue.get()
+    gradients = queue.get()
+    return activations, gradients
