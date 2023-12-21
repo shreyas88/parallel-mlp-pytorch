@@ -31,7 +31,7 @@ class LinearColumnWithGradReduce(torch.autograd.Function):
         input = input.view(-1, input.size(-1))
 
         # (batch*T, output_size_partition) * (batch*T, input_size_partition) -> (output_size_partition, input_size_partition)
-        grad_weight = grad_output.t().matmul(input)
+        grad_weight = input.matmul(grad_output.t())
         grad_bias = grad_output.sum(dim=0)
         handle.wait()
         return grad_input, grad_weight, grad_bias
