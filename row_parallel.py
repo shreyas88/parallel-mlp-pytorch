@@ -28,7 +28,7 @@ class LinearRowWithTensorReduce(torch.autograd.Function):
         # (output_size_partition,batch*T) * (batch*T, input_size) -> (output_size_partition, input_size)
         grad_weight = input.T.matmul(grad_output)
         grad_bias = grad_output.sum(dim=0)
-        return grad_input, grad_weight, grad_bias
+        return grad_input, grad_weight, grad_bias, None
 
 class RowParallelLinear(torch.nn.Module):
     """Linear layer with row parallelism.
