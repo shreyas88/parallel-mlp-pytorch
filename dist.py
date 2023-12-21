@@ -53,14 +53,14 @@ if __name__=='__main__':
     weight_layer2 = torch.randn(HIDDEN_DIM*4, HIDDEN_DIM, dtype=torch.float32)
     bias_layer2 = torch.randn(HIDDEN_DIM, dtype=torch.float32)
 
-    x = torch.randn(BATCH_SIZE, SEQ_LEN, HIDDEN_DIM).requires_grad_(True)
+    x = torch.randn(BATCH_SIZE, SEQ_LEN, HIDDEN_DIM)
     # dummy labels used for loss calculation
     dummy_labels = torch.randn(BATCH_SIZE, SEQ_LEN, HIDDEN_DIM)
 
     base_mlp = BaseMLPLayers(weight_layer1, bias_layer1, weight_layer2, bias_layer2)
-
+    clone_x = x.clone().requires_grad_(True)
     # check forward pass output with base MLP
-    base_output = base_mlp(x).cpu()
+    base_output = base_mlp(clone_x).cpu()
     activations, grad_actual = dist_launcher(2,my_test,weight_layer1,bias_layer1,weight_layer2, 
                                              bias_layer2, x, dummy_labels)
     print(base_output[0][0][0:10])
@@ -73,7 +73,7 @@ if __name__=='__main__':
     loss = torch.square(base_output-dummy_labels).sum()
     loss.backward()
     # calculated gradient for input
-    grad_expected = x.grad
+    grad_expected = clone_x.grad
     print(grad_expected[0][0][0:10])
     print(grad_actual[0][0][0:10])
     assert torch.allclose(grad_expected, grad_actual, atol=1e-4)
