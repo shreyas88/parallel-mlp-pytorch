@@ -53,7 +53,7 @@ if __name__=='__main__':
     weight_layer2 = torch.randn(HIDDEN_DIM*4, HIDDEN_DIM, dtype=torch.float32)
     bias_layer2 = torch.randn(HIDDEN_DIM, dtype=torch.float32)
 
-    x = torch.randn(BATCH_SIZE, SEQ_LEN, HIDDEN_DIM)
+    x = torch.randn(BATCH_SIZE, SEQ_LEN, HIDDEN_DIM).requires_grad_(True)
     # dummy labels used for loss calculation
     dummy_labels = torch.randn(BATCH_SIZE, SEQ_LEN, HIDDEN_DIM)
 
@@ -70,12 +70,12 @@ if __name__=='__main__':
     print("Parallel MLP output matched with base MLP output")
 
     # dummy loss function
-    loss = torch.square(activations-dummy_labels).sum()
+    loss = torch.square(base_output-dummy_labels).sum()
     loss.backward()
     # calculated gradient for input
     grad_expected = x.grad
-    print(base_output[0][0][0:10])
-    print(activations[0][0][0:10])
+    print(grad_expected[0][0][0:10])
+    print(grad_actual[0][0][0:10])
     assert torch.allclose(grad_expected, grad_actual, atol=1e-4)
     print("Parallel MLP gradient matched with base MLP gradient")
 
