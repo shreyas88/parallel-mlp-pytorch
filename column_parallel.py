@@ -21,7 +21,7 @@ class LinearColumnWithGradReduce(torch.autograd.Function):
 
         # (batch, output_size_partition) * (output_size_partition, input_size) -> (batch, input_size)   
         #  (batch, T, input_size) = (batch, T, 1) * (1, input_size)  
-        grad_input = grad_output.matmul(weight)
+        grad_input = grad_output.matmul(weight.T)
 
         # Asynchronous all-reduce
         handle = torch.distributed.all_reduce(grad_input, async_op=True)
